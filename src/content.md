@@ -14,17 +14,15 @@ You can use all standard formatting: **bold**, *italic*, `inline code`, [links](
 |---|---|
 | Single figure | `[MEDIA:N]` |
 | Carousel | `[MEDIA:1-4]` |
-| Side-by-side | `[MEDIA-SIDE-BY-SIDE]` block |
+| Multi-column | `[MEDIA-MULTICOL]` block |
 | Math | KaTeX — `$...$` and `$$...$$` |
 | Spacing | `[SPACING:large]` |
-
-[SPACING:small]
 
 ### Single figure
 
 A single item displayed full-width. The `{...}` after the token renders as a Markdown caption block above the media.
 
-[MEDIA:1]{**Figure 1 — Neural Architecture Overview.** The `[MEDIA:1]` token embeds item 1 from your media list at full width. The text inside `{...}` is rendered as Markdown — **bold**, *italic*, `code`, math ($\alpha, \beta$), all work.}
+[MEDIA:1]{**Figure 1 — Neural Architecture Overview.** The `MEDIA:1` token embeds item 1 from your media list at full width. The text inside `{...}` is rendered as Markdown — **bold**, *italic*, `code`, math ($\alpha, \beta$), all work.}
 
 [SPACING:medium]
 

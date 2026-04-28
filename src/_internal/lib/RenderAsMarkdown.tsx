@@ -55,8 +55,18 @@ export default function RenderAsMarkdown(content: string, media: MediaItem[] = [
   const rhPlugins = opts?.math ? [(rehypeKatex as any), (rehypeRaw as any)] : [];
 
   // ── parse ──────────────────────────────────────────────────────────────────
+  // Protect backtick-fenced spans (inline code, table cell literals) so their
+  // content is never mistaken for real tokens.
+  const codeStash: string[] = [];
+  const protect = (src: string) =>
+    src.replace(/`[^`]*`/g, (m) => { codeStash.push(m); return `\x00CODE${codeStash.length - 1}\x00`; });
+  const restore = (src: string) =>
+    src.replace(/\x00CODE(\d+)\x00/g, (_, i) => codeStash[Number(i)]);
+
+  const safeContent = protect(content);
+
   const multicolMap = new Map<string, { scale: number; cols: { indices: (number | "placeholder")[]; caption?: string }[] }>();
-  const processed = content.replace(/\[MEDIA-MULTICOL:([0-9.]+)\]([\s\S]*?)\[\/MEDIA-MULTICOL\]/gi, (_, scale, block) => {
+  const processed = safeContent.replace(/\[MEDIA-MULTICOL:([0-9.]+)\]([\s\S]*?)\[\/MEDIA-MULTICOL\]/gi, (_, scale, block) => {
     const cols: { indices: (number | "placeholder")[]; caption?: string }[] = [];
     let m: RegExpExecArray | null;
     // Trim surrounding whitespace/newlines from each column token before matching
@@ -78,6 +88,9 @@ export default function RenderAsMarkdown(content: string, media: MediaItem[] = [
     last = re.lastIndex;
   }
   if (last < processed.length) parts.push({ kind: "text", text: processed.slice(last) });
+
+  // Restore protected code spans in text parts
+  for (const p of parts) { if (p.kind === "text") p.text = restore(p.text); }
 
   // ── helpers ────────────────────────────────────────────────────────────────
   const resolve = (idx: number | "placeholder"): MediaItem | null =>
