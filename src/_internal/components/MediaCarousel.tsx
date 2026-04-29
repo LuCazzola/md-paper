@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type Item =
   | { type: "image"; src: string; caption?: string; title?: string }
@@ -30,123 +30,132 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
   titleFontSize = 16,
   captionFontSize = 13,
 }) => {
-  const hasClones = items.length > 1;
-  const slides = hasClones ? [items[items.length - 1], ...items, items[0]] : items;
-  const [si, setSi] = useState(hasClones ? 1 : 0);
-  const [noTransition, setNoTransition] = useState(false);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [ci, setCi] = useState(0);
+  // Track which indices are "mounted" so off-screen videos stay paused but
+  // nearby slides are pre-rendered for smooth transitions.
+  const activeRef = useRef<HTMLDivElement | null>(null);
+  const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
 
-  const ci = items.length > 0 ? ((si - 1 + items.length) % items.length) : 0;
-  const W = slides.length;
-
-  // Sync video play/pause on slide change
+  // Measure active slide height and sync it to the container
   useEffect(() => {
-    slideRefs.current.forEach((el, idx) => {
-      const v = el?.querySelector("video") as HTMLVideoElement | null;
-      if (!v) return;
+    if (!activeRef.current) return;
+    const el = activeRef.current;
+    const measure = () => setContainerHeight(el.getBoundingClientRect().height || el.scrollHeight || undefined);
+    measure();
+    // Re-measure after images/videos load
+    const imgs = el.querySelectorAll("img, video");
+    imgs.forEach((m) => {
+      m.addEventListener("load", measure, { once: true });
+      m.addEventListener("loadedmetadata", measure, { once: true });
+    });
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ci]);
+
+  // Pause/play videos when slide changes
+  useEffect(() => {
+    document.querySelectorAll<HTMLVideoElement>(`[data-carousel-video]`).forEach((v) => {
+      const idx = Number(v.dataset.carouselIndex ?? -1);
       try {
-        if (idx === si) { v.currentTime = 0; v.play()?.catch(() => {}); }
-        else { v.pause(); if (!isNaN(v.duration)) v.currentTime = 0; }
+        if (idx === ci) { v.currentTime = 0; v.play()?.catch(() => {}); }
+        else { v.pause(); }
       } catch {}
     });
-  }, [si]);
+  }, [ci]);
 
-  // Infinite-loop jump: after transition ends, silently jump clone → real slide
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el || !hasClones) return;
-    const onEnd = () => {
-      if (si === slides.length - 1) { setNoTransition(true); setSi(1); requestAnimationFrame(() => requestAnimationFrame(() => setNoTransition(false))); }
-      else if (si === 0)            { setNoTransition(true); setSi(slides.length - 2); requestAnimationFrame(() => requestAnimationFrame(() => setNoTransition(false))); }
-    };
-    el.addEventListener("transitionend", onEnd);
-    return () => el.removeEventListener("transitionend", onEnd);
-  }, [si, slides.length, hasClones]);
-
-  useEffect(() => { slideRefs.current = slideRefs.current.slice(0, slides.length); }, [slides.length]);
+  const go = (dir: number) => setCi((c) => (c + dir + items.length) % items.length);
 
   return (
     <div className="w-full">
-      {/* Viewport: clips the sliding track, height is driven by current slide content */}
-      <div style={{ position: "relative", width: "100%", overflow: "hidden", borderRadius: 8, background: "#fff" }}>
-        {/* Track: all slides laid out side by side, each 1/W of the total width */}
-        <div
-          ref={trackRef}
-          style={{
-            display: "flex",
-            width: `${W * 100}%`,
-            transition: noTransition ? "none" : "transform 420ms ease",
-            transform: `translateX(-${(si / W) * 100}%)`,
-            alignItems: "flex-start",   // each slide shrinks to its own height
-          }}
-        >
-          {slides.map((it, i) => {
-            const ri = hasClones ? ((i - 1 + items.length) % items.length) : i;
-            const dist = Math.min(Math.abs(ri - ci), Math.max(items.length, 1) - Math.abs(ri - ci));
-            const heavy = dist <= 1;
-            const Title = it.title
-              ? <div style={{ fontSize: titleFontSize, fontWeight: 600, marginBottom: 6, textAlign: "center" }}>{it.title}</div>
-              : null;
+      {/* Container: height animates to match current slide */}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          height: containerHeight ? `${containerHeight}px` : "auto",
+          transition: "height 300ms ease",
+          borderRadius: 8,
+          overflow: "hidden",
+          background: "#fff",
+        }}
+      >
+        {items.map((it, i) => {
+          const active = i === ci;
+          const near = Math.min(Math.abs(i - ci), items.length - Math.abs(i - ci)) <= 1;
+          const Title = it.title
+            ? <div style={{ fontSize: titleFontSize, fontWeight: 600, marginBottom: 6, textAlign: "center" }}>{it.title}</div>
+            : null;
 
-            return (
-              <div
-                key={i}
-                ref={(el) => (slideRefs.current[i] = el)}
-                style={{ width: `${100 / W}%`, flexShrink: 0, boxSizing: "border-box" }}
-              >
-                {Title}
-                {it.type === "image" && (
-                  <img
-                    src={it.src}
-                    alt={it.caption ?? "media"}
-                    loading="lazy"
-                    style={{ width: "100%", height: "auto", display: "block" }}
-                  />
-                )}
-                {it.type === "video" && (
-                  heavy
-                    ? <video
-                        controls loop playsInline preload="metadata"
-                        {...(!(it as any).audio ? { autoPlay: true, muted: true } : {})}
-                        poster={(it as any).poster}
-                        style={{ width: "100%", height: "auto", display: "block", background: "#000" }}
-                      >
-                        {videoSources(it.src).map((s, j) => <source key={j} src={s} {...(mimeFor(s) ? { type: mimeFor(s) } : {})} />)}
-                      </video>
-                    : <div style={{ width: "100%", aspectRatio: "16/9", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", opacity: 0.7 }}>Video</div>
-                )}
-                {it.type === "embed" && (
-                  heavy
-                    ? <iframe src={it.src} title={it.caption ?? "embed"} allowFullScreen style={{ border: 0, width: "100%", aspectRatio: "16/9", display: "block" }} />
-                    : <div style={{ width: "100%", aspectRatio: "16/9", background: "#eee", display: "flex", alignItems: "center", justifyContent: "center", color: "#666" }}>Embed</div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+          return (
+            <div
+              key={i}
+              ref={active ? activeRef : undefined}
+              style={{
+                position: active ? "relative" : "absolute",
+                top: 0, left: 0,
+                width: "100%",
+                opacity: active ? 1 : 0,
+                // keep in DOM but invisible so measurements and video state are stable
+                pointerEvents: active ? "auto" : "none",
+                transition: "opacity 300ms ease",
+                zIndex: active ? 1 : 0,
+              }}
+            >
+              {Title}
+              {it.type === "image" && (
+                <img
+                  src={it.src}
+                  alt={it.caption ?? "media"}
+                  loading="lazy"
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                />
+              )}
+              {it.type === "video" && (
+                near
+                  ? <video
+                      controls loop playsInline preload="metadata"
+                      {...(!(it as any).audio ? { autoPlay: active, muted: true } : {})}
+                      poster={(it as any).poster}
+                      data-carousel-video
+                      data-carousel-index={i}
+                      style={{ width: "100%", height: "auto", display: "block", background: "#000", borderRadius: 4 }}
+                    >
+                      {videoSources(it.src).map((s, j) => <source key={j} src={s} {...(mimeFor(s) ? { type: mimeFor(s) } : {})} />)}
+                    </video>
+                  : <div style={{ width: "100%", aspectRatio: "16/9", background: "#000" }} />
+              )}
+              {it.type === "embed" && (
+                near
+                  ? <iframe src={it.src} title={it.caption ?? "embed"} allowFullScreen
+                      style={{ border: 0, width: "100%", aspectRatio: "16/9", display: "block" }} />
+                  : <div style={{ width: "100%", aspectRatio: "16/9", background: "#eee" }} />
+              )}
+            </div>
+          );
+        })}
 
         {/* Prev / Next arrows */}
-        {hasClones && (
+        {items.length > 1 && (
           <>
-            <button onClick={() => setSi((s) => s - 1)} aria-label="Previous"
-              style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", background: "rgba(200,200,200,0.85)", borderRadius: "50%", width: 32, height: 32, border: "none", cursor: "pointer", zIndex: 5, fontSize: 20, lineHeight: 1 }}>‹</button>
-            <button onClick={() => setSi((s) => s + 1)} aria-label="Next"
-              style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", background: "rgba(200,200,200,0.85)", borderRadius: "50%", width: 32, height: 32, border: "none", cursor: "pointer", zIndex: 5, fontSize: 20, lineHeight: 1 }}>›</button>
+            <button onClick={() => go(-1)} aria-label="Previous"
+              style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", background: "rgba(200,200,200,0.85)", borderRadius: "50%", width: 32, height: 32, border: "none", cursor: "pointer", zIndex: 10, fontSize: 20, lineHeight: 1 }}>‹</button>
+            <button onClick={() => go(1)} aria-label="Next"
+              style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", background: "rgba(200,200,200,0.85)", borderRadius: "50%", width: 32, height: 32, border: "none", cursor: "pointer", zIndex: 10, fontSize: 20, lineHeight: 1 }}>›</button>
           </>
         )}
       </div>
 
-      {/* Caption for current slide */}
+      {/* Caption */}
       {items[ci]?.caption && (
         <div style={{ fontSize: captionFontSize, color: "#666", marginTop: 8 }}>{items[ci].caption}</div>
       )}
 
       {/* Dot indicators */}
-      {hasClones && (
+      {items.length > 1 && (
         <div style={{ marginTop: 12, display: "flex", gap: 8, justifyContent: "center" }}>
           {items.map((_, i) => (
-            <button key={i} onClick={() => setSi(i + (hasClones ? 1 : 0))} aria-label={`Slide ${i + 1}`}
+            <button key={i} onClick={() => setCi(i)} aria-label={`Slide ${i + 1}`}
               style={{ width: 8, height: 8, borderRadius: "50%", background: i === ci ? "var(--md-accent)" : "#ccc", border: "none", cursor: "pointer", padding: 0 }} />
           ))}
         </div>

@@ -7,12 +7,11 @@
  * │                                                                         │
  * │  Media files go in:  public/assets/media/                               │
  * │  Other files (PDF, zips) go in:  public/assets/resources/               │
+ * │                                                                         │
+ * │  Use plain paths starting with "/" — the base URL is added automatically.│
  * └─────────────────────────────────────────────────────────────────────────┘
  */
 import type { Publication, Theme } from "@/_internal/types";
-
-// Shorthand: resolves a path relative to the deployed site root.
-const a = (path: string) => `${import.meta.env.BASE_URL.replace(/\/$/, "")}/assets${path}`;
 
 // ── theme (all fields are optional — remove any line to use the default) ──────
 const theme: Theme = {
@@ -25,8 +24,8 @@ const theme: Theme = {
   headingFontSize: 22,          // h2/h3 inside abstract & content
   abstractFontSize:16,          // abstract body text in px
   contentFontSize: 16,          // markdown body text in px
-  mediaTitleFontSize:  18,       // media item title font size in px
-  mediaCaptionFontSize:18,       // media item caption font size in px
+  mediaTitleFontSize:  18,      // media item title font size in px
+  mediaCaptionFontSize:13,      // media item caption font size in px
   contentMaxWidth: 1200,        // max column width in px
   bodyFont:        "Lato, sans-serif",
   headingFont:     '"Patua One", serif',
@@ -49,7 +48,7 @@ const publication: Publication = {
 
   // ── optional text ─────────────────────────────────────────────────────────
   affiliations: "University X; Institute Y",
-  teaserIndex: 6,   // index of media item to show in the header (1-based)
+  teaserIndex: 6,   // 1-based index into media[] to show below the buttons
   abstract: `Your abstract text goes here. It will be shown in a grey box below the buttons. You can write multiple sentences — just keep it as a plain string (no markdown here).`,
 
   // ── links (remove or set to undefined to show a greyed-out button) ────────
@@ -62,46 +61,47 @@ const publication: Publication = {
   siteUrl: "https://your-portfolio.github.io/",
 
   // ── media list — referenced in content.md by 1-based index ────────────────
+  // Paths are relative to public/assets/ — just start with "/"
   media: [
     // 1 — single image example
     {
       type:    "image",
-      src:     a("/media/demo/figure1.jpg"),
+      src:     "/media/demo/figure1.jpg",
       title:   "Neural Architecture Overview",
       caption: "High-level diagram of the proposed architecture.",
     },
     // 2 — second image (used in side-by-side)
     {
       type:    "image",
-      src:     a("/media/demo/figure2.jpg"),
+      src:     "/media/demo/figure2.jpg",
       title:   "Experimental Setup",
       caption: "The physical setup used during data collection.",
     },
     // 3 — third image (carousel)
     {
       type:    "image",
-      src:     a("/media/demo/figure3.jpg"),
+      src:     "/media/demo/figure3.jpg",
       title:   "Quantitative Results",
       caption: "Performance curves across all benchmarks.",
     },
     // 4 — fourth image (carousel)
     {
       type:    "image",
-      src:     a("/media/demo/figure4.jpg"),
+      src:     "/media/demo/figure4.jpg",
       title:   "Ablation Study",
       caption: "Component-wise contribution to final accuracy.",
     },
     // 5 — first video
     {
       type:    "video",
-      src:     a("/media/demo/demo_video1.mp4"),
+      src:     "/media/demo/demo_video1.mp4",
       title:   "Method Demo",
       caption: "The model running in real time on a held-out test sequence.",
     },
     // 6 — second video (used in side-by-side comparison)
     {
       type:    "video",
-      src:     a("/media/demo/demo_video2.mp4"),
+      src:     "/media/demo/demo_video2.mp4",
       title:   "Baseline Comparison",
       caption: "The previous state-of-the-art on the same input.",
     },
