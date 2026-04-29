@@ -26,7 +26,7 @@ const theme: Theme = {
   abstractFontSize:16,          // abstract body text in px
   contentFontSize: 16,          // markdown body text in px
   mediaTitleFontSize:  18,       // media item title font size in px
-  mediaCaptionFontSize:13,       // media item caption font size in px
+  mediaCaptionFontSize:18,       // media item caption font size in px
   contentMaxWidth: 1200,        // max column width in px
   bodyFont:        "Lato, sans-serif",
   headingFont:     '"Patua One", serif',

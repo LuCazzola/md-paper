@@ -156,7 +156,7 @@ export default function RenderAsMarkdown(content: string, media: MediaItem[] = [
           if (!items.length) return null;
           const scale = typeof p.scale === "number" ? Math.max(0.05, Math.min(1, p.scale)) : 1;
           const max = Math.round(1200 * scale);
-          const inner = <><CaptionBlock text={p.caption} />{items.length === 1 ? renderItem(items[0], i) : <MediaCarousel items={items as any} />}</>;
+          const inner = <><CaptionBlock text={p.caption} />{items.length === 1 ? renderItem(items[0], i) : <MediaCarousel items={items as any} titleFontSize={titleFs} captionFontSize={captionFs} />}</>;
           return fullBleed(inner, i, "#fff", max);
         }
 
@@ -182,7 +182,7 @@ export default function RenderAsMarkdown(content: string, media: MediaItem[] = [
                           <div className="media">
                             {colItems.length === 0 ? <em style={{ color: "#999" }}>No media</em>
                               : colItems.length === 1 ? renderItem(colItems[0], `${i}-${j}`)
-                              : <MediaCarousel items={colItems as any} />}
+                              : <MediaCarousel items={colItems as any} titleFontSize={titleFs} captionFontSize={captionFs} />}
                           </div>
                         </div>
                       );
