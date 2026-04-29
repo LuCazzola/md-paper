@@ -1,6 +1,9 @@
-# md-paper
+# MD-Paper
 
 Publish an academic paper page on GitHub Pages by editing three plain-text files — no HTML, no build knowledge required.
+
+Projects build with MD-Paper
+* [Kinetic Mining in Context: Few-Shot Action Synthesis via Text-to-Motion Distillation](https://lucazzola.github.io/kinemic-page/)
 
 ## Quick start
 

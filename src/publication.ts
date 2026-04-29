@@ -1,5 +1,4 @@
 import type { Publication, Theme } from "@/_internal/types";
-import { COMING_SOON } from "@/_internal/types";
 
 const theme: Theme = {
   accentColor:     "#0a4b7c",   // headings, title color  (any CSS color)
@@ -33,8 +32,8 @@ const publication: Publication = {
 
   paper:         "https://arxiv.org/abs/2512.11654",
   pdf:           undefined,
-  code:          COMING_SOON,
-  supplementary: "/resources/pubs/kinemic_supplementary_material.zip",
+  code:          "https://github.com/LuCazzola/md-paper",
+  supplementary: undefined,
 
   siteUrl: "https://lucazzola.github.io/",
 
