@@ -1,3 +1,6 @@
+/** Use as a button value to show a greyed-out "Coming soon" button instead of hiding it. */
+export const COMING_SOON = "placeholder" as const;
+
 export type Theme = {
   /** Primary accent color used for headings and highlights (CSS color string). */
   accentColor?: string;

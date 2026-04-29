@@ -12,6 +12,7 @@
  * └─────────────────────────────────────────────────────────────────────────┘
  */
 import type { Publication, Theme } from "@/_internal/types";
+import { COMING_SOON } from "@/_internal/types";
 
 // ── theme (all fields are optional — remove any line to use the default) ──────
 const theme: Theme = {
@@ -57,7 +58,7 @@ const publication: Publication = {
   //   undefined       → button hidden entirely
   paper:         "https://arxiv.org/abs/XXXX.XXXXX",
   pdf:           undefined,
-  code:          "placeholder",
+  code:          COMING_SOON,
   supplementary: undefined,
 
   // ── back-link shown top-left ───────────────────────────────────────────────
