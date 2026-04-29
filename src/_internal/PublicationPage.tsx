@@ -50,32 +50,32 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
   const showMain = (!!pub.image || hasMedia) && !pub.content && !pub.teaserIndex;
 
   const t = pub.theme ?? {};
-  const accent = t.accentColor ?? "#0a4b7c";
+  const accent     = t.accentColor     ?? "#0a4b7c";
+  const pageBg     = t.pageBackground  ?? "#fff";
+  const blockBg    = t.blockBackground ?? "#f7f7f7";
+  const maxW       = t.contentMaxWidth ?? 1200;
+  const bodyFont   = t.bodyFont        ?? "Lato, sans-serif";
+  const headingFont = t.headingFont    ?? '"Patua One", serif';
+  const baseFontSize = t.baseFontSize  ?? 16;
 
-  // Inject theme as CSS variables so index.css / Tailwind prose also picks them up
   useEffect(() => {
     const root = document.documentElement;
-    // Convert hex/named accent to hsl for the Tailwind --primary variable
-    root.style.setProperty("--md-accent", accent);
-    if (t.baseFontSize)    root.style.fontSize = `${t.baseFontSize}px`;
-    if (t.bodyFont)        root.style.setProperty("font-family", t.bodyFont);
-    if (t.headingFont)     root.style.setProperty("--md-heading-font", t.headingFont);
-    if (t.pageBackground)  root.style.background = t.pageBackground;
+    root.style.setProperty("--md-accent",       accent);
+    root.style.setProperty("--md-heading-font", headingFont);
+    root.style.fontSize   = `${baseFontSize}px`;
+    root.style.fontFamily = bodyFont;
+    root.style.background = pageBg;
     return () => {
       root.style.removeProperty("--md-accent");
-      root.style.removeProperty("font-size");
       root.style.removeProperty("--md-heading-font");
+      root.style.removeProperty("font-size");
       root.style.removeProperty("font-family");
       root.style.removeProperty("background");
     };
-  }, [accent, t.baseFontSize, t.bodyFont, t.headingFont, t.pageBackground]);
-
-  const pageBg    = t.pageBackground  ?? "#fff";
-  const blockBg   = t.blockBackground ?? "#f7f7f7";
-  const maxW      = t.contentMaxWidth ?? 1200;
+  }, [accent, headingFont, baseFontSize, bodyFont, pageBg]);
 
   return (
-    <div style={{ background: pageBg, color: "#111", minHeight: "100vh" }}>
+    <div style={{ background: pageBg, color: "#111", minHeight: "100vh", fontFamily: bodyFont, fontSize: baseFontSize }}>
 
       {/* ── top bar ────────────────────────────────────────────────────────── */}
       <div style={{ borderBottom: "1px solid #e6e6e6" }}>
