@@ -8,6 +8,10 @@
     --primary-foreground: 0 0% 100%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
+
+    /* Theme defaults — overridden at runtime by PublicationPage when pub.theme is set */
+    --md-accent: #0a4b7c;
+    --md-heading-font: "Patua One", serif;
   }
 
   html { font-size: 16px; }
@@ -16,7 +20,7 @@
   body { font-family: "Lato", sans-serif; }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Patua One", serif;
-    color: hsl(var(--primary));
+    font-family: var(--md-heading-font);
+    color: var(--md-accent);
   }
 }

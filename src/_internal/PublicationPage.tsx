@@ -31,8 +31,8 @@ const VideoEl: React.FC<{ src: string }> = ({ src }) => (
 // ─── button styles ────────────────────────────────────────────────────────────
 
 const btn: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 8, borderRadius: 6, padding: "8px 12px", fontSize: 14, fontWeight: 500, textDecoration: "none", border: "none", cursor: "pointer" };
+const btnRed   = { ...btn, background: "#c0392b", color: "#fff" } as React.CSSProperties;
 const btnBlue  = { ...btn, background: "#0b69ff", color: "#fff" } as React.CSSProperties;
-const btnGrey  = { ...btn, background: "#555",    color: "#fff" } as React.CSSProperties;
 const btnBlack = { ...btn, background: "#111",    color: "#fff" } as React.CSSProperties;
 const btnOff   = { ...btn, background: "transparent", color: "#999", border: "1px solid #ddd", opacity: 0.6, cursor: "not-allowed" } as React.CSSProperties;
 
@@ -49,8 +49,33 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
   // Show main media block when there's no content.md layout and no teaserIndex
   const showMain = (!!pub.image || hasMedia) && !pub.content && !pub.teaserIndex;
 
+  const t = pub.theme ?? {};
+  const accent = t.accentColor ?? "#0a4b7c";
+
+  // Inject theme as CSS variables so index.css / Tailwind prose also picks them up
+  useEffect(() => {
+    const root = document.documentElement;
+    // Convert hex/named accent to hsl for the Tailwind --primary variable
+    root.style.setProperty("--md-accent", accent);
+    if (t.baseFontSize)    root.style.fontSize = `${t.baseFontSize}px`;
+    if (t.bodyFont)        root.style.setProperty("font-family", t.bodyFont);
+    if (t.headingFont)     root.style.setProperty("--md-heading-font", t.headingFont);
+    if (t.pageBackground)  root.style.background = t.pageBackground;
+    return () => {
+      root.style.removeProperty("--md-accent");
+      root.style.removeProperty("font-size");
+      root.style.removeProperty("--md-heading-font");
+      root.style.removeProperty("font-family");
+      root.style.removeProperty("background");
+    };
+  }, [accent, t.baseFontSize, t.bodyFont, t.headingFont, t.pageBackground]);
+
+  const pageBg    = t.pageBackground  ?? "#fff";
+  const blockBg   = t.blockBackground ?? "#f7f7f7";
+  const maxW      = t.contentMaxWidth ?? 1200;
+
   return (
-    <div style={{ background: "#fff", color: "#111", minHeight: "100vh" }}>
+    <div style={{ background: pageBg, color: "#111", minHeight: "100vh" }}>
 
       {/* ── top bar ────────────────────────────────────────────────────────── */}
       <div style={{ borderBottom: "1px solid #e6e6e6" }}>
@@ -61,13 +86,13 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
       </div>
 
       <main style={{ paddingTop: 28, paddingBottom: 60 }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 28px" }}>
+        <div style={{ maxWidth: maxW, margin: "0 auto", padding: "0 28px" }}>
 
           {/* ── header ───────────────────────────────────────────────────────── */}
           <header style={{ textAlign: "center" }}>
-            <h1 style={{ fontSize: "clamp(28px, 5vw, 48px)", lineHeight: 1.05, margin: 0 }}>{pub.title}</h1>
+            <h1 style={{ fontSize: `clamp(28px, 5vw, ${t.titleFontSize ?? 48}px)`, lineHeight: 1.05, margin: 0, color: accent, fontFamily: t.headingFont }}>{pub.title}</h1>
 
-            <div style={{ marginTop: 12, fontSize: 18, fontWeight: 700, display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ marginTop: 12, fontSize: t.authorFontSize ?? 18, fontWeight: 700, display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
               {pub.authors.map(([name, url], i) => (
                 <span key={i}>
                   {url ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>{name}</a> : name}
@@ -88,7 +113,7 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
                 : null}
 
               {pub.paper
-                ? <a href={pub.paper} target="_blank" rel="noreferrer" style={btnGrey}><ExternalLink size={16} /><span>Paper</span></a>
+                ? <a href={pub.paper} target="_blank" rel="noreferrer" style={btnRed}><ExternalLink size={16} /><span>Paper</span></a>
                 : <Tooltip text="Coming soon"><button disabled style={btnOff}><ExternalLink size={16} /><span>Paper</span></button></Tooltip>}
 
               {pub.code
@@ -133,21 +158,21 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
 
           {/* ── teaser (when teaserIndex is set) ─────────────────────────────── */}
           {pub.teaserIndex && hasMedia && (() => {
-            const t = media[pub.teaserIndex! - 1];
-            if (!t) return null;
+            const teaser = media[pub.teaserIndex! - 1];
+            if (!teaser) return null;
             return (
               <div style={{ marginTop: 40 }}>
-                {t.type === "video" ? <VideoEl src={t.src} /> : t.type === "image" ? <img src={t.src} alt={pub.title} style={{ width: "100%", borderRadius: 8 }} /> : null}
-                {t.caption && <div style={{ marginTop: 8, color: "#555", fontSize: 13, textAlign: "center" }}>{t.caption}</div>}
+                {teaser.type === "video" ? <VideoEl src={teaser.src} /> : teaser.type === "image" ? <img src={teaser.src} alt={pub.title} style={{ width: "100%", borderRadius: 8 }} /> : null}
+                {teaser.caption && <div style={{ marginTop: 8, color: "#555", fontSize: 13, textAlign: "center" }}>{teaser.caption}</div>}
               </div>
             );
           })()}
 
           {/* ── abstract ─────────────────────────────────────────────────────── */}
           {pub.abstract && (
-            <section style={{ background: "#f7f7f7", padding: 20, borderRadius: 8, marginTop: 20 }}>
-              <h2 style={{ marginTop: 0 }}>Abstract</h2>
-              <p style={{ marginBottom: 0 }}>{pub.abstract}</p>
+            <section style={{ background: blockBg, padding: 20, borderRadius: 8, marginTop: 20 }}>
+              <h2 style={{ marginTop: 0, fontSize: t.headingFontSize ?? 22, color: accent, fontFamily: t.headingFont }}>Abstract</h2>
+              <p style={{ marginBottom: 0, fontSize: t.abstractFontSize ?? 16 }}>{pub.abstract}</p>
             </section>
           )}
 
@@ -155,7 +180,7 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
           {pub.content && (
             <>
               <ThreeBallSeparator />
-              <section style={{ marginBottom: 48 }}>
+              <section style={{ marginBottom: 48, fontSize: t.contentFontSize ?? 16 }}>
                 {RenderAsMarkdown(pub.content, media, { math: true })}
               </section>
             </>

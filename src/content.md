@@ -50,9 +50,9 @@ Videos autoplay muted and loop by default — ideal for showing motion or animat
 
 [SPACING:medium]
 
-### Side-by-side comparison
+### Multi-Column support
 
-The `[MEDIA-SIDE-BY-SIDE]` block places columns next to each other. Columns collapse to a single column on mobile automatically. The scale factor (here `1.1`) lets the block extend slightly beyond the normal content width.
+The `[MEDIA-MULTICOL]` block places columns next to each other. Columns collapse to a single column on mobile automatically. The scale factor (here `1.1`) lets the block extend slightly beyond the normal content width.
 
 [MEDIA-MULTICOL:1.1]
 [MEDIA:5]{**Ours.** A side-by-side column with a video on the left. Caption text is Markdown — *italic*, **bold**, and $\LaTeX$ all work.}

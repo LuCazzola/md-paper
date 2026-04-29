@@ -9,14 +9,31 @@
  * │  Other files (PDF, zips) go in:  public/assets/resources/               │
  * └─────────────────────────────────────────────────────────────────────────┘
  */
-import type { Publication } from "@/_internal/types";
+import type { Publication, Theme } from "@/_internal/types";
 
 // Shorthand: resolves a path relative to the deployed site root.
 const a = (path: string) => `${import.meta.env.BASE_URL.replace(/\/$/, "")}/assets${path}`;
 
+// ── theme (all fields are optional — remove any line to use the default) ──────
+const theme: Theme = {
+  accentColor:     "#0a4b7c",   // headings, title color  (any CSS color)
+  pageBackground:  "#ffffff",   // page background
+  blockBackground: "#f7f7f7",   // abstract / text-block background
+  baseFontSize:    16,          // root font size in px (scales everything)
+  titleFontSize:   48,          // paper title, max px (clamped on small screens)
+  authorFontSize:  18,          // author list font size in px
+  headingFontSize: 22,          // h2/h3 inside abstract & content
+  abstractFontSize:16,          // abstract body text in px
+  contentFontSize: 16,          // markdown body text in px
+  contentMaxWidth: 1200,        // max column width in px
+  bodyFont:        "Lato, sans-serif",
+  headingFont:     '"Patua One", serif',
+};
+
 const publication: Publication = {
   // ── required ──────────────────────────────────────────────────────────────
   title: "Your Paper Title",
+  theme,
 
   // Each author is [displayName, optionalProfileURL]
   authors: [
@@ -30,10 +47,8 @@ const publication: Publication = {
 
   // ── optional text ─────────────────────────────────────────────────────────
   affiliations: "University X; Institute Y",
-
-  abstract: `Your abstract text goes here. It will be shown in a grey box
-below the buttons. You can write multiple sentences — just keep it as
-a plain string (no markdown here).`,
+  teaserIndex: 6,   // index of media item to show in the header (1-based)
+  abstract: `Your abstract text goes here. It will be shown in a grey box below the buttons. You can write multiple sentences — just keep it as a plain string (no markdown here).`,
 
   // ── links (remove or set to undefined to show a greyed-out button) ────────
   paper:         "https://arxiv.org/abs/XXXX.XXXXX",   // arXiv, publisher, or any URL
