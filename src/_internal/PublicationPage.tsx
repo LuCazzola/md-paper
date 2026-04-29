@@ -84,7 +84,7 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
   }, [accent, headingFont, baseFontSize, bodyFont, pageBg]);
 
   return (
-    <div style={{ background: pageBg, color: "#111", minHeight: "100vh", fontFamily: bodyFont, fontSize: baseFontSize }}>
+    <div style={{ background: pageBg, color: "#111", minHeight: "100vh", fontFamily: bodyFont, fontSize: baseFontSize, overflowX: "clip" }}>
       <style>{BTN_CSS}</style>
 
       {/* ── top bar ────────────────────────────────────────────────────────── */}

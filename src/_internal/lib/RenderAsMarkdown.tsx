@@ -136,7 +136,7 @@ export default function RenderAsMarkdown(content: string, media: MediaItem[] = [
   );
 
   const fullBleed = (children: React.ReactNode, key: React.Key, bg: string, innerMax: number) => (
-    <div key={key} style={{ marginTop: 12, background: bg, padding: 12, borderRadius: 8, marginInline: "calc(-50vw + 50%)" }}>
+    <div key={key} style={{ marginTop: 12, background: bg, padding: 12, borderRadius: 8, width: "100vw", position: "relative", left: "50%", transform: "translateX(-50%)" }}>
       <div style={{ maxWidth: innerMax, margin: "0 auto" }}>{children}</div>
     </div>
   );
@@ -178,7 +178,7 @@ export default function RenderAsMarkdown(content: string, media: MediaItem[] = [
                 #${cid} .media img,#${cid} .media video,#${cid} .media iframe{max-width:100%;width:100%;height:auto;display:block}
                 #${cid} .media figure{max-width:100%;min-width:0;overflow:hidden;margin:0}
               `}</style>
-              <div id={cid} style={{ marginTop: 12, background: "#fff", padding: 12, borderRadius: 8, marginInline: "calc(-50vw + 50%)" }}>
+              <div id={cid} style={{ marginTop: 12, background: "#fff", padding: 12, borderRadius: 8, width: "100vw", position: "relative", left: "50%", transform: "translateX(-50%)" }}>
                 <div className="inner" style={{ maxWidth: max, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
                   <div className="grid" style={{ display: "grid", gridTemplateColumns: `repeat(${p.cols.length},1fr)`, alignItems: "end" }}>
                     {p.cols.map((col, j) => {
