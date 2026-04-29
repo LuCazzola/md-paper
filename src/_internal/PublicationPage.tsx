@@ -204,11 +204,11 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
       </main>
 
       {/* ── footer ───────────────────────────────────────────────────────── */}
-      <footer style={{ borderTop: "1px solid #e6e6e6", padding: "28px", textAlign: "center", fontSize: 12, color: "#aaa", letterSpacing: "0.02em" }}>
+      <footer style={{ background: accent, padding: "28px", textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.75)", letterSpacing: "0.02em" }}>
         <div>© {new Date().getFullYear()} {pub.authors[0]?.[0] ?? "The Authors"}. All rights reserved.</div>
         <div style={{ marginTop: 6 }}>
           Page built with{" "}
-          <a href="https://github.com/LuCazzola/md-paper" target="_blank" rel="noopener noreferrer" style={{ color: "#aaa", textDecoration: "underline" }}>
+          <a href="https://github.com/LuCazzola/md-paper" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(255,255,255,0.75)", textDecoration: "underline" }}>
             md-paper
           </a>
           {" · "}Open source, free to use with attribution.
