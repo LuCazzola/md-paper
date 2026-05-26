@@ -48,9 +48,10 @@ export type Publication = {
   title: string;
   /** Visual theme overrides — all fields are optional */
   theme?: Theme;
-  /** Array of [displayName, optionalProfileURL] */
-  authors: Array<[string, string?]>;
-  affiliations?: string;
+  /** Array of [displayName, optionalProfileURL, optionalSuperscript] e.g. ["A. Author", "https://...", "1,2"] */
+  authors: Array<[string, string?, string?]>;
+  /** Array of [marker, institutionName] e.g. ["1", "University of X"] */
+  affiliations?: Array<[string, string]>;
   venue?: string;
   year?: string;
   pdf?: string;

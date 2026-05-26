@@ -37,10 +37,11 @@ const publication: Publication = {
   title: "Your Paper Title",
   theme,
 
-  // Each author is [displayName, optionalProfileURL]
+  // Each author is [displayName, optionalProfileURL, optionalSuperscript]
   authors: [
-    ["A. Author",  "https://scholar.google.com/"],
-    ["B. Coauthor"],   // no link → just plain text
+    ["A. Author",  "https://scholar.google.com/", "1"],
+    ["B. Coauthor", undefined,                    "1,2"],  // no link → plain text
+    ["C. Coauthor"],                                        // no link, no superscript
   ],
 
   // ── venue & year ──────────────────────────────────────────────────────────
@@ -48,7 +49,11 @@ const publication: Publication = {
   year:  "2025",
 
   // ── optional text ─────────────────────────────────────────────────────────
-  affiliations: "University X; Institute Y",
+  // Each affiliation is [marker, institutionName]
+  affiliations: [
+    ["1", "University X"],
+    ["2", "Institute Y"],
+  ],
   teaserIndex: 6,   // 1-based index into media[] to show below the buttons
   abstract: `Your abstract text goes here. It will be shown in a grey box below the buttons. You can write multiple sentences — just keep it as a plain string (no markdown here).`,
 

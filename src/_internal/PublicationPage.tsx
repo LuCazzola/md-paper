@@ -100,15 +100,22 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
             <h1 style={{ fontSize: `clamp(28px, 5vw, ${t.titleFontSize ?? 48}px)`, lineHeight: 1.05, margin: 0, color: accent, fontFamily: t.headingFont }}>{pub.title}</h1>
 
             <div style={{ marginTop: 12, fontSize: t.authorFontSize ?? 18, fontWeight: 700, display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
-              {pub.authors.map(([name, url], i) => (
+              {pub.authors.map(([name, url, sup], i) => (
                 <span key={i}>
                   {url ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>{name}</a> : name}
+                  {sup && <sup style={{ fontSize: "0.6em", fontWeight: 400, marginLeft: 1 }}>{sup}</sup>}
                   {i < pub.authors.length - 1 && <span style={{ color: "#666" }}>, </span>}
                 </span>
               ))}
             </div>
 
-            {pub.affiliations && <div style={{ marginTop: 8, color: "#666", fontSize: 16 }}>{pub.affiliations}</div>}
+            {pub.affiliations && (
+              <div style={{ marginTop: 8, color: "#666", fontSize: 14, display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+                {pub.affiliations.map(([marker, name]) => (
+                  <span key={marker}><sup style={{ fontSize: "0.75em" }}>{marker}</sup> {name}</span>
+                ))}
+              </div>
+            )}
             <div style={{ marginTop: 8, color: "#666", fontSize: 14, lineHeight: 1.5 }}>
               {pub.venue && pub.venue !== "?" ? <>{pub.venue}<br />{pub.year}</> : pub.year}
             </div>
