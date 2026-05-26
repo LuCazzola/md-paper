@@ -24,6 +24,7 @@ import rehypeRaw from "rehype-raw";
 import "katex/dist/katex.min.css";
 import MediaCarousel from "@/_internal/components/MediaCarousel";
 import type { MediaItem } from "@/_internal/types";
+import { mimeFor, videoSources } from "@/_internal/lib/videoUtils";
 
 type Part =
   | { kind: "text"; text: string }
@@ -48,9 +49,6 @@ function parseIndices(raw: string, aliases: Map<string, number> = new Map()): (n
   }
   return out;
 }
-
-const mimeFor = (src?: string) => { const e = src?.split("?")[0].split(".").pop()?.toLowerCase(); return e === "mp4" ? "video/mp4" : e === "webm" ? "video/webm" : e === "ogv" || e === "ogg" ? "video/ogg" : undefined; };
-const videoSources = (s?: string) => { if (!s) return [] as string[]; const [p, q] = s.split("?"); const e = p.split(".").pop()?.toLowerCase() ?? ""; const b = p.replace(/\.[^.]+$/, ""); const qs = q ? `?${q}` : ""; const c = [s]; if (e === "mp4") c.push(`${b}.webm${qs}`); else if (e === "webm") c.push(`${b}.mp4${qs}`); else { c.push(`${b}.mp4${qs}`); c.push(`${b}.webm${qs}`); } return [...new Set(c)]; };
 
 export default function RenderAsMarkdown(content: string, media: MediaItem[] = [], opts?: { math?: boolean; mediaTitleFontSize?: number; mediaCaptionFontSize?: number }): React.ReactNode {
   if (!content) return null;

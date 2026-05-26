@@ -4,11 +4,7 @@ import type { Publication, MediaItem } from "@/_internal/types";
 import RenderAsMarkdown from "@/_internal/lib/RenderAsMarkdown";
 import MediaCarousel from "@/_internal/components/MediaCarousel";
 import ThreeBallSeparator from "@/_internal/components/ThreeBallSeparator";
-
-// ─── small helpers ────────────────────────────────────────────────────────────
-
-const mimeFor = (src?: string) => { const e = src?.split("?")[0].split(".").pop()?.toLowerCase(); return e === "mp4" ? "video/mp4" : e === "webm" ? "video/webm" : e === "ogv" || e === "ogg" ? "video/ogg" : undefined; };
-const videoSources = (s?: string) => { if (!s) return [] as string[]; const [p, q] = s.split("?"); const e = p.split(".").pop()?.toLowerCase() ?? ""; const b = p.replace(/\.[^.]+$/, ""); const qs = q ? `?${q}` : ""; const c = [s]; if (e === "mp4") c.push(`${b}.webm${qs}`); else if (e === "webm") c.push(`${b}.mp4${qs}`); else { c.push(`${b}.mp4${qs}`); c.push(`${b}.webm${qs}`); } return [...new Set(c)]; };
+import { mimeFor, videoSources } from "@/_internal/lib/videoUtils";
 
 const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
   const [show, setShow] = useState(false);
@@ -31,6 +27,7 @@ const VideoEl: React.FC<{ src: string }> = ({ src }) => (
 // ─── button styles ────────────────────────────────────────────────────────────
 
 const BTN_CSS = `
+@media (max-width: 600px) { .venue-topbar { display: none; } }
 .pub-btn { display:inline-flex;align-items:center;gap:8px;border-radius:6px;padding:8px 12px;font-size:14px;font-weight:500;text-decoration:none;border:none;cursor:pointer;transition:filter 150ms ease,transform 150ms ease; }
 .pub-btn:hover  { filter:brightness(1.15);transform:translateY(-1px); }
 .pub-btn:active { filter:brightness(0.92);transform:translateY(0); }
@@ -89,9 +86,9 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
 
       {/* ── top bar ────────────────────────────────────────────────────────── */}
       <div style={{ borderBottom: "1px solid #e6e6e6" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "10px 28px", display: "flex", justifyContent: "space-between", fontSize: 13, color: "#666" }}>
-          <a href={pub.siteUrl ?? "/"} style={{ color: "#666", textDecoration: "none" }}>← Back to site</a>
-          <div>{pub.venue && pub.venue !== "?" ? <>{pub.venue} • {pub.year}</> : pub.year}</div>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "10px 28px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", fontSize: 13, color: "#666", flexWrap: "wrap", gap: "4px 16px" }}>
+          <a href={pub.siteUrl ?? "/"} style={{ color: "#666", textDecoration: "none", whiteSpace: "nowrap" }}>← Back to site</a>
+          <div style={{ textAlign: "right" }}><span className="venue-topbar">{pub.venue && pub.venue !== "?" ? <>{pub.venue} • </> : null}</span>{pub.year}</div>
         </div>
       </div>
 
@@ -112,8 +109,8 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
             </div>
 
             {pub.affiliations && <div style={{ marginTop: 8, color: "#666", fontSize: 16 }}>{pub.affiliations}</div>}
-            <div style={{ marginTop: 8, color: "#666", fontSize: 14 }}>
-              {pub.venue && pub.venue !== "?" ? <>{pub.venue} • {pub.year}</> : pub.year}
+            <div style={{ marginTop: 8, color: "#666", fontSize: 14, lineHeight: 1.5 }}>
+              {pub.venue && pub.venue !== "?" ? <>{pub.venue}<br />{pub.year}</> : pub.year}
             </div>
 
             {/* buttons — undefined = hidden, "placeholder" = coming soon, URL = active */}

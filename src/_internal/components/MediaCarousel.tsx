@@ -1,29 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
+import { mimeFor, videoSources } from "@/_internal/lib/videoUtils";
 
 type Item =
   | { type: "image"; src: string; caption?: string; title?: string }
   | { type: "video"; src: string; poster?: string; caption?: string; title?: string; audio?: boolean }
   | { type: "embed"; src: string; caption?: string; title?: string };
-
-const mimeFor = (src?: string) => {
-  const ext = src?.split("?")[0].split(".").pop()?.toLowerCase();
-  if (ext === "mp4") return "video/mp4";
-  if (ext === "webm") return "video/webm";
-  if (ext === "ogv" || ext === "ogg") return "video/ogg";
-};
-
-const videoSources = (s?: string) => {
-  if (!s) return [] as string[];
-  const [path, query] = s.split("?");
-  const ext = path.split(".").pop()?.toLowerCase() ?? "";
-  const base = path.replace(/\.[^.]+$/, "");
-  const q = query ? `?${query}` : "";
-  const c = [s];
-  if (ext === "mp4") c.push(`${base}.webm${q}`);
-  else if (ext === "webm") c.push(`${base}.mp4${q}`);
-  else { c.push(`${base}.mp4${q}`); c.push(`${base}.webm${q}`); }
-  return [...new Set(c)];
-};
 
 const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFontSize?: number }> = ({
   items,
@@ -32,10 +13,8 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
 }) => {
   const [ci, setCi] = useState(0);
   const [containerHeight, setContainerHeight] = useState<number | undefined>(undefined);
-  const [sliding, setSliding] = useState(false);
   const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
 
-  // Measure active slide and update container height
   const measureActive = () => {
     const el = slideRefs.current[ci];
     if (!el) return;
@@ -49,7 +28,6 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
     if (!el) return;
     const ro = new ResizeObserver(measureActive);
     ro.observe(el);
-    // Re-measure when media loads
     el.querySelectorAll("img, video").forEach((m) => {
       m.addEventListener("load", measureActive, { once: true });
       m.addEventListener("loadedmetadata", measureActive, { once: true });
@@ -57,7 +35,6 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
     return () => ro.disconnect();
   }, [ci]);
 
-  // Pause/play videos on slide change
   useEffect(() => {
     slideRefs.current.forEach((el, idx) => {
       const v = el?.querySelector("video") as HTMLVideoElement | null;
@@ -69,16 +46,11 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
     });
   }, [ci]);
 
-  const go = (dir: number) => {
-    if (sliding) return;
-    setCi((c) => (c + dir + items.length) % items.length);
-  };
-
   const W = items.length;
+  const go = (dir: number) => setCi((c) => (c + dir + W) % W);
 
   return (
     <div className="w-full">
-      {/* Viewport — clips the track, height follows active slide */}
       <div style={{
         position: "relative",
         width: "100%",
@@ -88,7 +60,6 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
         background: "#fff",
         transition: "height 300ms ease",
       }}>
-        {/* Track — all slides in a row, shifted by translateX */}
         <div style={{
           display: "flex",
           width: `${W * 100}%`,
@@ -133,7 +104,6 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
           })}
         </div>
 
-        {/* Arrows */}
         {W > 1 && <>
           <button onClick={() => go(-1)} aria-label="Previous"
             style={{ position: "absolute", left: 8, top: "50%", transform: "translateY(-50%)", background: "rgba(200,200,200,0.85)", borderRadius: "50%", width: 32, height: 32, border: "none", cursor: "pointer", zIndex: 10, fontSize: 20, lineHeight: 1 }}>‹</button>
@@ -142,12 +112,10 @@ const MediaCarousel: React.FC<{ items: Item[]; titleFontSize?: number; captionFo
         </>}
       </div>
 
-      {/* Caption */}
       {items[ci]?.caption && (
         <div style={{ fontSize: captionFontSize, color: "#666", marginTop: 8 }}>{items[ci].caption}</div>
       )}
 
-      {/* Dots */}
       {W > 1 && (
         <div style={{ marginTop: 12, display: "flex", gap: 8, justifyContent: "center" }}>
           {items.map((_, i) => (

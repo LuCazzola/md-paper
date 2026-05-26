@@ -63,7 +63,6 @@ export type Publication = {
   /** 1-based index into media[] to use as standalone teaser (overrides `image`) */
   teaserIndex?: number;
   supplementary?: string;
-  tags?: string[];
   abstract?: string;
   /** Raw markdown string — populated automatically from content.md via main.tsx */
   content?: string;
