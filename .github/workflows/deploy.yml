@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # allows manual trigger from the GitHub UI
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,31 +12,25 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-
       - run: npm ci
-
       - name: Build
         run: npm run build
-        # If GitHub Pages serves from a sub-path (e.g. /my-paper/), set:
-        #   env:
-        #     VITE_BASE: /my-paper/
-        # Otherwise leave it — the default "./" works for a root-deployed repo.
-
+        env:
+          VITE_BASE: ${{ vars.VITE_BASE }}
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: docs
 
   deploy:
     needs: build

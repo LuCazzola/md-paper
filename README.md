@@ -8,9 +8,51 @@ Write your paper page entirely in Markdown — no HTML, no JSX, no build knowled
 ## Quick start
 
 1. **Use this template** — click *Use this template* on GitHub to create your repo
-2. **Enable GitHub Pages** — Settings → Pages → Source → **GitHub Actions**
-3. **Edit three things** — `src/publication.ts`, `src/content.md`, and drop media in `public/assets/media/`
-4. Push — your page deploys automatically
+2. **Edit three things** — `src/publication.ts`, `src/content.md`, and drop media in `public/assets/media/`
+3. **Deploy** — pick one of the two methods below
+4. Push — your page is live
+
+---
+
+## Deployment
+
+### Option A — GitHub Actions (recommended)
+
+The repo includes a workflow at `.github/workflows/deploy.yml` that builds and publishes automatically on every push to `main`.
+
+1. Go to **Settings → Pages**
+2. Set **Source** to **GitHub Actions**
+3. Push to `main` — the workflow runs and deploys
+
+> **Custom base path** (required when your site lives at `https://org.github.io/repo-name/`):
+> Go to **Settings → Variables → Actions**, add a repository variable `VITE_BASE` set to `/repo-name/`.
+> The workflow passes it to Vite at build time automatically.
+
+---
+
+### Option B — Deploy from branch (`gh-pages` + `/docs` folder)
+
+Use this if you prefer to keep full control over when deploys happen, or if you want both source and build output on the same branch.
+
+**One-time setup:**
+
+1. Run `npm run build` locally — output goes to `docs/`
+2. Commit `docs/` and push to your deployment branch (e.g. `gh-pages`)
+3. Go to **Settings → Pages**, set **Source** to your branch and folder `/docs`
+
+**Every subsequent deploy:**
+
+```bash
+npm run build
+git add docs/
+git commit -m "Deploy"
+git push origin gh-pages
+```
+
+> **Custom base path:** set the env variable before building:
+> ```bash
+> VITE_BASE=/repo-name/ npm run build
+> ```
 
 ---
 
@@ -143,6 +185,9 @@ src/
   publication.ts  ← ✏️  edit this
   content.md      ← ✏️  edit this
   _internal/      ← template internals — do not edit
+.github/
+  workflows/
+    deploy.yml    ← GitHub Actions deploy (Option A)
 ```
 
 ---
