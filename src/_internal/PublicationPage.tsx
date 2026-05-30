@@ -212,8 +212,8 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
         <div>© {new Date().getFullYear()} {pub.authors[0]?.[0] ?? "The Authors"}. All rights reserved.</div>
         <div style={{ marginTop: 6 }}>
           Page built with{" "}
-          <a href="https://github.com/LuCazzola/md-paper" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(255,255,255,0.75)", textDecoration: "underline" }}>
-            md-paper
+          <a href="https://github.com/LuCazzola/MarkDownPAPER" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(255,255,255,0.75)", textDecoration: "underline" }}>
+            MarkDownPAPER
           </a>
           {" · "}Open source, free to use with attribution.
         </div>
