@@ -7,16 +7,22 @@ const isPaperMode = !!process.env.PAPER_MODE;
 const engineDir = path.resolve(__dirname);
 const projectRoot = isPaperMode ? path.resolve(engineDir, "..") : engineDir;
 
-// Read basePath from publication.ts so users never need to set VITE_BASE manually.
-// Falls back to VITE_BASE env var, then "/".
+// Derive base path automatically from package.json "name" (= repo name).
+// Can be overridden with basePath in publication.ts or VITE_BASE env var.
 function readBasePath(): string {
+  if (process.env.VITE_BASE) return process.env.VITE_BASE;
   const pubFile = path.join(projectRoot, "publication.ts");
   if (fs.existsSync(pubFile)) {
     const src = fs.readFileSync(pubFile, "utf-8");
     const m = src.match(/basePath\s*:\s*["'`]([^"'`]+)["'`]/);
     if (m) return m[1];
   }
-  return process.env.VITE_BASE ?? "/";
+  const pkgFile = path.join(projectRoot, "package.json");
+  if (fs.existsSync(pkgFile)) {
+    const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf-8"));
+    if (pkg.name) return `/${pkg.name}/`;
+  }
+  return "/";
 }
 
 export default defineConfig(({ mode }) => ({
