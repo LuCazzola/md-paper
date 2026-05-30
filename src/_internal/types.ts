@@ -69,4 +69,6 @@ export type Publication = {
   content?: string;
   /** URL of your main portfolio/site shown in the top-left "Back to site" link */
   siteUrl?: string;
+  /** URL base path for GitHub Pages deployment, e.g. "/my-paper/" (default "/") */
+  basePath?: string;
 };

@@ -1,29 +1,31 @@
 /**
  * main.tsx  —  entry point
- *
  * Wires publication.ts + content.md into the page renderer.
  * You do NOT need to edit this file.
  */
 import React from "react";
 import ReactDOM from "react-dom/client";
 import PublicationPage from "@/_internal/PublicationPage";
-import publication from "./publication";
 import "@/_internal/index.css";
-import content from "./content.md?raw";
 
-// Resolve asset paths: prepend BASE_URL/assets to any src/image/supplementary
-// that starts with "/" so publication.ts can use plain paths like "/media/foo.jpg"
-const base = import.meta.env.BASE_URL.replace(/\/$/, "") + "/assets";
+// In paper mode (PAPER_MODE=1), Vite root = paper repo root,
+// so absolute paths "/publication.ts" and "/content.md" resolve there.
+// In standalone demo mode, root = md-paper/, same result.
+import publication from "/publication.ts";
+import content from "/content.md?raw";
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const resolve = (p?: string) => (p && p.startsWith("/") ? base + p : p);
 
 if (publication.media) {
   publication.media = publication.media.map((m) => ({ ...m, src: resolve(m.src) ?? m.src }));
 }
-if (publication.image)         publication.image         = resolve(publication.image);
 if (publication.supplementary) publication.supplementary = resolve(publication.supplementary);
 if (publication.pdf)           publication.pdf           = resolve(publication.pdf);
 
 publication.content = content;
+
+if (publication.title) document.title = publication.title;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

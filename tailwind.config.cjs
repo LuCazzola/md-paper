@@ -1,7 +1,13 @@
+const path = require("path");
+
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   darkMode: ["class"],
-  content: ["./src/**/*.{ts,tsx}", "./index.html"],
+  content: [
+    path.join(__dirname, "src/**/*.{ts,tsx}"),
+    path.join(__dirname, "../publication.ts"),
+    path.join(__dirname, "index.html"),
+  ],
   theme: {
     extend: {
       colors: {

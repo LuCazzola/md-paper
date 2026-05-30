@@ -1,12 +1,15 @@
 {
-  "name": "md-paper",
+  "name": "md-paper-engine",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:paper": "cross-env PAPER_MODE=1 vite --config vite.config.ts",
+    "build:paper": "cross-env PAPER_MODE=1 vite build --config vite.config.ts",
+    "preview:paper": "cross-env PAPER_MODE=1 vite preview --config vite.config.ts"
   },
   "dependencies": {
     "katex": "^0.16.25",
@@ -20,6 +23,7 @@
     "remark-math": "^4.0.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.23",
