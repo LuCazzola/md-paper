@@ -87,7 +87,7 @@ const PublicationPage: React.FC<{ pub: Publication }> = ({ pub }) => {
       {/* ── top bar ────────────────────────────────────────────────────────── */}
       <div style={{ borderBottom: "1px solid #e6e6e6" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", padding: "10px 28px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", fontSize: 13, color: "#666", flexWrap: "wrap", gap: "4px 16px" }}>
-          <a href={pub.siteUrl ?? "/"} style={{ color: "#666", textDecoration: "none", whiteSpace: "nowrap" }}>← Back to site</a>
+          <a href={pub.siteUrl ?? "/"} style={{ color: "#666", textDecoration: "none", whiteSpace: "nowrap" }}>{pub.siteLabel ?? "← Back to site"}</a>
           <div style={{ textAlign: "right" }}><span className="venue-topbar">{pub.venue && pub.venue !== "?" ? <>{pub.venue} • </> : null}</span>{pub.year}</div>
         </div>
       </div>

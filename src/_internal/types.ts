@@ -67,8 +67,10 @@ export type Publication = {
   abstract?: string;
   /** Raw markdown string — populated automatically from content.md via main.tsx */
   content?: string;
-  /** URL of your main portfolio/site shown in the top-left "Back to site" link */
+  /** URL of your main portfolio/site shown in the top-left back link */
   siteUrl?: string;
+  /** Label for the top-left back link (default: "← Back to site") */
+  siteLabel?: string;
   /** URL base path for GitHub Pages deployment, e.g. "/my-paper/" (default "/") */
   basePath?: string;
 };
